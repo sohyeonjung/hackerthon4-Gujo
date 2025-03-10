@@ -12,3 +12,4 @@ services:
 
 volumes:
   mysql_data:  # 볼륨을 명시적으로 정의
+
