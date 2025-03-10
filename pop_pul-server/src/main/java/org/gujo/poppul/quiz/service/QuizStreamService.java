@@ -119,8 +119,8 @@ public class QuizStreamService {
                 throw new RuntimeException("연결 오류");
             }
         }
-
     }
+
 
     //quizid로 quiz찾기
     public Optional<QuizStreamResponse> getQuizById(Long quizId) {
