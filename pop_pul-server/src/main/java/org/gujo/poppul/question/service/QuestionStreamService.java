@@ -3,6 +3,7 @@ package org.gujo.poppul.question.service;
 import org.gujo.poppul.answer.service.AnswerStreamService;
 import org.gujo.poppul.question.dto.QuestionStreamResponse;
 import org.gujo.poppul.question.entity.Question;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionStreamService {
 
+    @Autowired
     private AnswerStreamService answerStreamService;
 
 
