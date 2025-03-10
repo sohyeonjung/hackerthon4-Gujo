@@ -23,7 +23,7 @@ public class QuestionStreamService {
 
         return QuestionStreamResponse.builder()
                 .id(question.getId())
-                .name(question.getName())
+                .title(question.getTitle())
                 .quizId(question.getQuiz().getId())
                 .answerList(answerList)
                 .build();
