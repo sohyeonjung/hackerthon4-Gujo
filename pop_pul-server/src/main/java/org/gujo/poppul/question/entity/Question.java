@@ -1,3 +1,4 @@
+
 package org.gujo.poppul.question.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,12 +10,10 @@ import org.gujo.poppul.quiz.entity.Quiz;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
+@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString
 @Entity
 @Table(name = "Question")
 public class Question {
@@ -22,11 +21,12 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String images;
-    //@JsonIgnore
-    //@ToString.Exclude
-    @ManyToOne()
+    private String title;
+    private String image;
+
+    @ToString.Exclude
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
