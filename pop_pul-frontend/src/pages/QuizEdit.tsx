@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { quizService, Quiz, CreateQuizData } from "../services/quiz";
+import { quizService, CreateQuizData } from "../services/quiz";
+import "./QuizEdit.css";
 
 interface QuestionForm {
   content: string;
@@ -16,20 +17,21 @@ const QuizEdit: React.FC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [timeLimit, setTimeLimit] = useState(30);
-  const [questions, setQuestions] = useState<QuestionForm[]>([]);
+  const [questions, setQuestions] = useState<QuestionForm[]>([
+    { content: "", options: ["", "", "", ""], correctAnswer: 0 },
+  ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadQuiz();
+    if (id) {
+      loadQuiz(id);
+    }
   }, [id]);
 
-  const loadQuiz = async () => {
-    if (!id) return;
-
+  const loadQuiz = async (quizId: string) => {
     try {
-      setLoading(true);
-      const quiz = await quizService.fetchQuiz(id);
+      const quiz = await quizService.getQuiz(quizId);
       setTitle(quiz.title);
       setDescription(quiz.description);
       setTimeLimit(quiz.timeLimit);
@@ -47,21 +49,21 @@ const QuizEdit: React.FC = () => {
     }
   };
 
-  const handleAddQuestion = () => {
+  const addQuestion = () => {
     setQuestions([
       ...questions,
       { content: "", options: ["", "", "", ""], correctAnswer: 0 },
     ]);
   };
 
-  const handleRemoveQuestion = (index: number) => {
+  const removeQuestion = (index: number) => {
     setQuestions(questions.filter((_, i) => i !== index));
   };
 
   const handleQuestionChange = (
     index: number,
     field: keyof QuestionForm,
-    value: string | number | string[]
+    value: any
   ) => {
     const newQuestions = [...questions];
     newQuestions[index] = {
@@ -83,12 +85,7 @@ const QuizEdit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!user || !id) {
-      setError("권한이 없습니다.");
-      return;
-    }
+    if (!id) return;
 
     try {
       const quizData: CreateQuizData = {
@@ -99,113 +96,89 @@ const QuizEdit: React.FC = () => {
           content: q.content,
           options: q.options,
           correctAnswer: q.correctAnswer,
-          order: index + 1,
+          order: index,
         })),
       };
 
       await quizService.updateQuiz(id, quizData);
-      navigate(`/quizzes/${id}`);
+      navigate("/quizzes");
     } catch (err) {
       setError("퀴즈 수정에 실패했습니다.");
     }
   };
 
   if (loading) {
+    return <div className="loading">로딩 중...</div>;
+  }
+
+  if (!user) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl">로딩 중...</div>
+      <div className="quiz-edit-container">
+        <div className="error-message">
+          퀴즈를 수정하려면 로그인이 필요합니다.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">퀴즈 수정</h1>
-
-      {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            퀴즈 제목
-          </label>
+    <div className="quiz-edit-container">
+      <h1>퀴즈 수정</h1>
+      <form onSubmit={handleSubmit} className="quiz-edit-form">
+        <div className="form-group">
+          <label htmlFor="title">퀴즈 제목</label>
           <input
             type="text"
+            id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            퀴즈 설명
-          </label>
+        <div className="form-group">
+          <label htmlFor="description">퀴즈 설명</label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            문제당 제한 시간 (초)
-          </label>
-          <input
-            type="number"
-            value={timeLimit}
-            onChange={(e) => setTimeLimit(Number(e.target.value))}
-            min="10"
-            max="300"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
         </div>
 
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">문제 목록</h2>
-            <button
-              type="button"
-              onClick={handleAddQuestion}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
-              문제 추가
-            </button>
-          </div>
+        <div className="form-group">
+          <label htmlFor="timeLimit">제한 시간 (초)</label>
+          <input
+            type="number"
+            id="timeLimit"
+            value={timeLimit}
+            onChange={(e) => setTimeLimit(Number(e.target.value))}
+            min="1"
+            required
+          />
+        </div>
 
+        <div className="questions-section">
+          <h2>문제 목록</h2>
           {questions.map((question, questionIndex) => (
-            <div
-              key={questionIndex}
-              className="border rounded-lg p-6 space-y-4"
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">
-                  문제 {questionIndex + 1}
-                </h3>
+            <div key={questionIndex} className="question-card">
+              <div className="question-header">
+                <h3>문제 {questionIndex + 1}</h3>
                 {questions.length > 1 && (
                   <button
                     type="button"
-                    onClick={() => handleRemoveQuestion(questionIndex)}
-                    className="text-red-600 hover:text-red-800"
+                    onClick={() => removeQuestion(questionIndex)}
+                    className="remove-button"
                   >
                     삭제
                   </button>
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  문제 내용
-                </label>
-                <textarea
+              <div className="form-group">
+                <label>문제 내용</label>
+                <input
+                  type="text"
                   value={question.content}
                   onChange={(e) =>
                     handleQuestionChange(
@@ -214,21 +187,14 @@ const QuizEdit: React.FC = () => {
                       e.target.value
                     )
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  rows={2}
                   required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  보기
-                </label>
+              <div className="options-section">
+                <label>보기</label>
                 {question.options.map((option, optionIndex) => (
-                  <div
-                    key={optionIndex}
-                    className="flex items-center space-x-2 mb-2"
-                  >
+                  <div key={optionIndex} className="option-group">
                     <input
                       type="radio"
                       name={`correct-${questionIndex}`}
@@ -240,7 +206,6 @@ const QuizEdit: React.FC = () => {
                           optionIndex
                         )
                       }
-                      className="h-4 w-4 text-indigo-600"
                     />
                     <input
                       type="text"
@@ -252,7 +217,6 @@ const QuizEdit: React.FC = () => {
                           e.target.value
                         )
                       }
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder={`보기 ${optionIndex + 1}`}
                       required
                     />
@@ -261,21 +225,28 @@ const QuizEdit: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
 
-        <div className="flex justify-end space-x-4">
           <button
             type="button"
-            onClick={() => navigate(`/quizzes/${id}`)}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            onClick={addQuestion}
+            className="add-question-button"
           >
-            취소
+            문제 추가
+          </button>
+        </div>
+
+        {error && <div className="error-message">{error}</div>}
+
+        <div className="form-actions">
+          <button type="submit" className="submit-button">
+            수정 완료
           </button>
           <button
-            type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            type="button"
+            onClick={() => navigate("/quizzes")}
+            className="cancel-button"
           >
-            저장
+            취소
           </button>
         </div>
       </form>

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { quizService, CreateQuizData } from "../services/quiz";
+import "./QuizCreate.css";
 
 interface QuestionForm {
   content: string;
@@ -21,21 +22,31 @@ const QuizCreate: React.FC = () => {
   ]);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAddQuestion = () => {
+  if (!user) {
+    return (
+      <div className="quiz-create-container">
+        <div className="error-message">
+          퀴즈를 만들려면 로그인이 필요합니다.
+        </div>
+      </div>
+    );
+  }
+
+  const addQuestion = () => {
     setQuestions([
       ...questions,
       { content: "", options: ["", "", "", ""], correctAnswer: 0 },
     ]);
   };
 
-  const handleRemoveQuestion = (index: number) => {
+  const removeQuestion = (index: number) => {
     setQuestions(questions.filter((_, i) => i !== index));
   };
 
   const handleQuestionChange = (
     index: number,
     field: keyof QuestionForm,
-    value: string | number | string[]
+    value: any
   ) => {
     const newQuestions = [...questions];
     newQuestions[index] = {
@@ -57,13 +68,6 @@ const QuizCreate: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!user) {
-      setError("로그인이 필요합니다.");
-      return;
-    }
-
     try {
       const quizData: CreateQuizData = {
         title,
@@ -73,105 +77,75 @@ const QuizCreate: React.FC = () => {
           content: q.content,
           options: q.options,
           correctAnswer: q.correctAnswer,
-          order: index + 1,
+          order: index,
         })),
       };
 
-      const response = await quizService.createQuiz(quizData);
-      navigate(`/quizzes/${response.id}`);
+      await quizService.createQuiz(quizData);
+      navigate("/quizzes");
     } catch (error) {
-      setError("퀴즈 생성에 실패했습니다.");
+      setError("퀴즈 생성에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">새로운 퀴즈 만들기</h1>
-
-      {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            퀴즈 제목
-          </label>
+    <div className="quiz-create-container">
+      <h1>새 퀴즈 만들기</h1>
+      <form onSubmit={handleSubmit} className="quiz-create-form">
+        <div className="form-group">
+          <label htmlFor="title">퀴즈 제목</label>
           <input
             type="text"
+            id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            퀴즈 설명
-          </label>
+        <div className="form-group">
+          <label htmlFor="description">퀴즈 설명</label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            문제당 제한 시간 (초)
-          </label>
-          <input
-            type="number"
-            value={timeLimit}
-            onChange={(e) => setTimeLimit(Number(e.target.value))}
-            min="10"
-            max="300"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
         </div>
 
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">문제 목록</h2>
-            <button
-              type="button"
-              onClick={handleAddQuestion}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
-              문제 추가
-            </button>
-          </div>
+        <div className="form-group">
+          <label htmlFor="timeLimit">제한 시간 (초)</label>
+          <input
+            type="number"
+            id="timeLimit"
+            value={timeLimit}
+            onChange={(e) => setTimeLimit(Number(e.target.value))}
+            min="1"
+            required
+          />
+        </div>
 
+        <div className="questions-section">
+          <h2>문제 목록</h2>
           {questions.map((question, questionIndex) => (
-            <div
-              key={questionIndex}
-              className="border rounded-lg p-6 space-y-4"
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">
-                  문제 {questionIndex + 1}
-                </h3>
+            <div key={questionIndex} className="question-card">
+              <div className="question-header">
+                <h3>문제 {questionIndex + 1}</h3>
                 {questions.length > 1 && (
                   <button
                     type="button"
-                    onClick={() => handleRemoveQuestion(questionIndex)}
-                    className="text-red-600 hover:text-red-800"
+                    onClick={() => removeQuestion(questionIndex)}
+                    className="remove-button"
                   >
                     삭제
                   </button>
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  문제 내용
-                </label>
-                <textarea
+              <div className="form-group">
+                <label>문제 내용</label>
+                <input
+                  type="text"
                   value={question.content}
                   onChange={(e) =>
                     handleQuestionChange(
@@ -180,21 +154,14 @@ const QuizCreate: React.FC = () => {
                       e.target.value
                     )
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  rows={2}
                   required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  보기
-                </label>
+              <div className="options-section">
+                <label>보기</label>
                 {question.options.map((option, optionIndex) => (
-                  <div
-                    key={optionIndex}
-                    className="flex items-center space-x-2 mb-2"
-                  >
+                  <div key={optionIndex} className="option-group">
                     <input
                       type="radio"
                       name={`correct-${questionIndex}`}
@@ -206,7 +173,6 @@ const QuizCreate: React.FC = () => {
                           optionIndex
                         )
                       }
-                      className="h-4 w-4 text-indigo-600"
                     />
                     <input
                       type="text"
@@ -218,7 +184,6 @@ const QuizCreate: React.FC = () => {
                           e.target.value
                         )
                       }
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       placeholder={`보기 ${optionIndex + 1}`}
                       required
                     />
@@ -227,21 +192,28 @@ const QuizCreate: React.FC = () => {
               </div>
             </div>
           ))}
+
+          <button
+            type="button"
+            onClick={addQuestion}
+            className="add-question-button"
+          >
+            문제 추가
+          </button>
         </div>
 
-        <div className="flex justify-end space-x-4">
+        {error && <div className="error-message">{error}</div>}
+
+        <div className="form-actions">
+          <button type="submit" className="submit-button">
+            퀴즈 만들기
+          </button>
           <button
             type="button"
             onClick={() => navigate("/quizzes")}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="cancel-button"
           >
             취소
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-          >
-            퀴즈 생성
           </button>
         </div>
       </form>
