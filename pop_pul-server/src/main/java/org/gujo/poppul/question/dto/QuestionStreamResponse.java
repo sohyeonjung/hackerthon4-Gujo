@@ -18,8 +18,8 @@ import java.util.List;
 public class QuestionStreamResponse {
 
     private Long id;
-    private String name;
-    private String images;
+    private String title;
+    private String image;
     private Long quizId;
 
     private List<AnswerStreamResponse> answerList = new ArrayList<>();
