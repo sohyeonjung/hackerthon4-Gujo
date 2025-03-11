@@ -1,10 +1,13 @@
 // src/routes.tsx
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout'; // layouts 대신 components로 이동
-import Home from './pages/Home';
-// import QuizCreate from './pages/QuizCreate';
-// import QuizEdit from './pages/QuizEdit';
-// import QuizList from './pages/QuizList';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import MainLayout from "./layouts/MainLayout"; // layouts 대신 components로 이동
+import Home from "./pages/Home";
+import QuizList from "./pages/quiz/QuizList";
+import QuizCreate from "./pages/quiz/QuizCreate";
+import QuizEdit from "./pages/quiz/QuizEdit";
+import QuizDetail from "./pages/quiz/QuizDetail";
+import ProblemList from "./pages/quiz/ProblemList";
+import ProblemCreate from "./pages/quiz/ProblemCreate";
 // import QuizPlay from './pages/QuizPlay';
 // import QuizResult from './pages/QuizResult';
 
@@ -31,16 +34,13 @@ const AppRoutes = () => {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="quiz">
-            {/* <Route index element={<QuizList />} />
-            <Route
-              path="create"
-              element={
-                <ProtectedRoute>
-                  <QuizCreate />
-                </ProtectedRoute>
-              }
-            />
-            <Route
+            <Route index element={<QuizList />} />
+            <Route path="create" element={<QuizCreate />} />
+            <Route path=":id" element={<QuizDetail />} />
+            <Route path=":id/edit" element={<QuizEdit />} />
+            <Route path=":id/problems" element={<ProblemList />} />
+            <Route path=":id/problems/create" element={<ProblemCreate />} />
+            {/* <Route
               path="edit/:id"
               element={
                 <ProtectedRoute>
