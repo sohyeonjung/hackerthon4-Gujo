@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Problem, CreateProblemDto } from "../types/problem";
+import { Problem, CreateProblemDto, UpdateProblemDto } from "../types/problem";
 
 const API_URL = "http://localhost:8080/api/quiz";
 
@@ -56,7 +56,7 @@ export const problemService = {
   updateProblem: async (
     quizId: number,
     problemId: number,
-    problem: Partial<Problem>
+    problem: UpdateProblemDto
   ): Promise<Problem> => {
     try {
       const response = await axiosInstance.put(
@@ -73,6 +73,7 @@ export const problemService = {
   // 문제 삭제
   deleteProblem: async (quizId: number, problemId: number): Promise<void> => {
     try {
+      console.log(`Deleting problem: quizId=${quizId}, problemId=${problemId}`); // 디버깅용 로그 추가
       await axiosInstance.delete(`${API_URL}/${quizId}/questions/${problemId}`);
     } catch (error) {
       console.error("Error deleting problem:", error);
