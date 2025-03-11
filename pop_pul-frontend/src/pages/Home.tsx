@@ -1,27 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 //import { quizService } from "../services/quiz";
 import "./Home.css";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  // const { user } = useAuth();
-  const [pin, setPin] = useState("");
-  const [error] = useState<string | null>(null);
   const user = false;
-
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // if (!pin) return;
-
-    // try {
-    //   setError(null);
-    //   const quiz = await quizService.joinQuiz(pin);
-    //   navigate(`/quizzes/${quiz.id}/play`);
-    // } catch (error) {
-    //   setError("잘못된 PIN 번호입니다. 다시 확인해주세요."+error);
-    // }
-  };
 
   return (
     <div className="home-container">
@@ -33,9 +17,16 @@ const Home: React.FC = () => {
             <span className="block highlight">함께 풀어보세요</span>
           </h1>
           <p>
-            PIN 번호만으로 퀴즈에 참여할 수 있습니다. 친구들과 함께 재미있게
+            친구들과 함께 재미있게
             문제를 풀어보세요.
           </p>
+
+    <button
+    onClick={() => navigate("/quizplay")}
+    className="play-quiz-button"
+    >
+    퀴즈 참여하기
+    </button>
           {user && (
             <div className="hero-button">
               <button
@@ -49,30 +40,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* PIN 입력 섹션 */}
-      <div className="pin-section">
-        <div className="pin-box">
-          <h2>PIN 번호로 참여하기</h2>
-          {error && <div className="error-message">{error}</div>}
-          <form onSubmit={handleJoin} className="pin-form">
-            <input
-              type="text"
-              value={pin}
-              onChange={(e) =>
-                setPin(e.target.value.replace(/[^0-9]/g, "").slice(0, 4))
-              }
-              placeholder="PIN 번호를 입력하세요"
-              maxLength={4}
-              pattern="[0-9]*"
-              required
-            />
-            <button type="submit" className="join-button">
-              참여하기
-            </button>
-          </form>
-          <p className="pin-info">* PIN 번호는 퀴즈 생성자에게 문의하세요.</p>
-        </div>
-      </div>
+
 
       {/* 안내 섹션 */}
       <div className="guide-section">
