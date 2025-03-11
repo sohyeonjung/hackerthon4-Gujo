@@ -28,5 +28,4 @@ public class Answer {
     @JsonIgnore
     @JoinColumn(name = "question_id")
     private Question question;
-
 }

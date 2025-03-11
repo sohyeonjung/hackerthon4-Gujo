@@ -55,4 +55,15 @@ public class UserController {
             );
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<UserResponse> logout(HttpSession session) {
+        session.invalidate(); // 세션을 무효화하여 로그아웃 처리
+        return ResponseEntity.ok(
+                UserResponse.builder()
+                        .success(true)
+                        .message("로그아웃 성공")
+                        .build()
+        );
+    }
 }
