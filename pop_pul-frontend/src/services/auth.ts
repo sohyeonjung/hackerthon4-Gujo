@@ -1,35 +1,27 @@
-import { api } from "./api";
+import { authService } from "./api";
+import { User } from "../types/auth";
 
-export interface User {
-  id: string;
-  nickname: string;
-  username: string;
-}
+export const login = async (
+  username: string,
+  password: string
+): Promise<User> => {
+  const response = await authService.login(username, password);
+  return response.user;
+};
 
-export const authService = {
-  getCurrentUser: async (): Promise<User> => {
-    const response = await api.get<User>("/auth/me");
-    return response.data;
-  },
+export const signup = async (
+  username: string,
+  password: string,
+  nickname: string
+): Promise<User> => {
+  const response = await authService.signup(username, password, nickname);
+  return response.user;
+};
 
-  login: async (username: string, password: string): Promise<User> => {
-    const response = await api.post<User>("/auth/login", {
-      username,
-      password,
-    });
-    return response.data;
-  },
+export const logout = async (): Promise<void> => {
+  await authService.logout();
+};
 
-  signup: async (data: {
-    nickname: string;
-    username: string;
-    password: string;
-  }): Promise<User> => {
-    const response = await api.post<User>("/auth/signup", data);
-    return response.data;
-  },
-
-  logout: async (): Promise<void> => {
-    await api.post("/auth/logout");
-  },
+export const getCurrentUser = async (): Promise<User> => {
+  return await authService.getCurrentUser();
 };

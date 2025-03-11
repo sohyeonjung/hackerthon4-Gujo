@@ -1,0 +1,226 @@
+.home-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* Hero Section */
+.hero-section {
+  background-color: white;
+  padding: 4rem 1rem;
+}
+
+.hero-content {
+  max-width: 64rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.hero-content .highlight {
+  color: #4f46e5;
+}
+
+.hero-content p {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  color: #4b5563;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-button {
+  margin-top: 2rem;
+}
+
+.create-quiz-button {
+  padding: 0.75rem 2rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-quiz-button:hover {
+  background-color: #4338ca;
+}
+
+/* PIN Section */
+.pin-section {
+  padding: 3rem 1rem;
+}
+
+.pin-box {
+  max-width: 64rem;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.pin-box h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.pin-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pin-form input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.pin-form input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.join-button {
+  padding: 0.5rem 1.5rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.join-button:hover {
+  background-color: #059669;
+}
+
+.pin-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Guide Section */
+.guide-section {
+  padding: 3rem 1rem;
+}
+
+.guide-grid {
+  max-width: 64rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.guide-item {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.guide-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4f46e5;
+  margin-bottom: 1rem;
+}
+
+.guide-item h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.guide-item p {
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+/* CTA Section */
+.cta-section {
+  background-color: white;
+  padding: 3rem 1rem;
+}
+
+.cta-content {
+  max-width: 64rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.cta-content h2 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.cta-content .highlight {
+  color: #4f46e5;
+}
+
+.start-button {
+  padding: 0.75rem 2rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.start-button:hover {
+  background-color: #4338ca;
+}
+
+/* Error Message */
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #fee2e2;
+  border-radius: 0.375rem;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .hero-content h1 {
+    font-size: 1.875rem;
+  }
+
+  .pin-form {
+    flex-direction: column;
+  }
+
+  .cta-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}

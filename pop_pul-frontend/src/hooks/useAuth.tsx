@@ -1,5 +1,10 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { authService } from "../services/auth";
+import {
+  login as loginService,
+  signup as signupService,
+  logout as logoutService,
+  getCurrentUser,
+} from "../services/auth";
 import { User, AuthContextType } from "../types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const userData = await authService.getCurrentUser();
+        const userData = await getCurrentUser();
         setUser(userData);
       } catch (err) {
         setUser(null);
@@ -37,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (username: string, password: string) => {
     try {
       setError(null);
-      const userData = await authService.login(username, password);
+      const userData = await loginService(username, password);
       setUser(userData);
     } catch (err) {
       setError("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
@@ -52,7 +57,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }) => {
     try {
       setError(null);
-      const userData = await authService.signup(data);
+      const userData = await signupService(
+        data.username,
+        data.password,
+        data.nickname
+      );
       setUser(userData);
     } catch (err) {
       setError("회원가입에 실패했습니다. 다른 아이디를 사용해보세요.");
@@ -62,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await authService.logout();
+      await logoutService();
       setUser(null);
     } catch (err) {
       setError("로그아웃에 실패했습니다.");
