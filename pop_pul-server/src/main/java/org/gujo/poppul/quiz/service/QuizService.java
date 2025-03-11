@@ -95,4 +95,11 @@ public class QuizService {
     public void deleteQuestion(Long questionId) {
         questionRepository.deleteById(questionId);
     }
+
+
+    public List<Question> getQuizQuestions(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new QuizNotFoundException("퀴즈를 찾을 수 없습니다."));
+        return questionRepository.findByQuizId(quizId);
+    }
 }
