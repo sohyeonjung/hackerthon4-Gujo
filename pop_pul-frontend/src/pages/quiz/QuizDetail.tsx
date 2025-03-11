@@ -1,24 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Quiz } from "../../types/quiz";
+import { Problem } from "../../types/problem";
 import { quizService } from "../../services/quizService";
+import { problemService } from "../../services/problemService";
 
 const QuizDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [problems, setProblems] = useState<Problem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadQuiz();
+    loadQuizAndProblems();
   }, [id]);
 
-  const loadQuiz = async () => {
+  const loadQuizAndProblems = async () => {
     if (!id) return;
     try {
-      const data = await quizService.getQuiz(id);
-      setQuiz(data);
+      const [quizData, problemsData] = await Promise.all([
+        quizService.getQuiz(id),
+        problemService.getProblems(Number(id)),
+      ]);
+      setQuiz(quizData);
+      setProblems(problemsData);
       setError(null);
     } catch (err) {
       setError("퀴즈 정보를 불러오는데 실패했습니다.");
@@ -52,10 +59,10 @@ const QuizDetail: React.FC = () => {
               <h1 className="text-3xl font-bold">{quiz.title}</h1>
               <div className="flex space-x-2">
                 <button
-                  onClick={() => navigate(`/quiz/${id}/problems`)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  onClick={() => navigate(`/quiz/${id}/problems/create`)}
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 >
-                  문제 관리
+                  문제 추가
                 </button>
                 <button
                   onClick={() => navigate(`/quiz/${id}/edit`)}
@@ -72,20 +79,80 @@ const QuizDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-2">퀴즈 설명</h2>
-              <p className="text-gray-600 whitespace-pre-line">
-                {quiz.description}
-              </p>
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="text-sm text-gray-500">
-                <p>생성일: {new Date(quiz.createdAt).toLocaleDateString()}</p>
-                <p>
-                  최종 수정일: {new Date(quiz.updatedAt).toLocaleDateString()}
-                </p>
-              </div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-semibold mb-4">문제 목록</h2>
+              {problems.length === 0 ? (
+                <p className="text-gray-500">아직 등록된 문제가 없습니다.</p>
+              ) : (
+                <div className="space-y-4">
+                  {problems.map((problem, index) => (
+                    <div
+                      key={problem.id}
+                      className="border rounded-lg p-4 hover:bg-gray-50"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-medium">
+                            {index + 1}. {problem.title}
+                          </h3>
+                          {problem.image && (
+                            <img
+                              src={problem.image}
+                              alt="문제 이미지"
+                              className="mt-2 max-w-md rounded"
+                            />
+                          )}
+                          <div className="mt-2 space-y-1">
+                            {problem.answerList.map((answer, answerIndex) => (
+                              <p
+                                key={answer.id}
+                                className={`${
+                                  answer.isCorrect
+                                    ? "text-green-600 font-medium"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                {answerIndex + 1}. {answer.content}
+                                {answer.isCorrect && " (정답)"}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/quiz/${id}/problems/${problem.id}/edit`
+                              )
+                            }
+                            className="text-blue-500 hover:text-blue-600"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "정말로 이 문제를 삭제하시겠습니까?"
+                                )
+                              ) {
+                                problemService.deleteProblem(
+                                  Number(id),
+                                  problem.id
+                                );
+                                loadQuizAndProblems();
+                              }
+                            }}
+                            className="text-red-500 hover:text-red-600"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

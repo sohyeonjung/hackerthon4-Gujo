@@ -1,18 +1,13 @@
 export interface Quiz {
-  id: string;
+  id: number;
   title: string;
-  description: string;
-  createdAt: Date;
-  updatedAt: Date;
-  authorId: string;
+  userId: string;
 }
 
 export interface CreateQuizDto {
   title: string;
-  description: string;
 }
 
 export interface UpdateQuizDto {
   title?: string;
-  description?: string;
 }

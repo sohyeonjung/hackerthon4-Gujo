@@ -12,7 +12,9 @@ export const problemService = {
   // 특정 퀴즈의 모든 문제 조회
   getProblems: async (quizId: number): Promise<Problem[]> => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/${quizId}/problems`);
+      const response = await axiosInstance.get(
+        `${API_URL}/${quizId}/questions`
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching problems:", error);
@@ -24,7 +26,7 @@ export const problemService = {
   getProblem: async (quizId: string, problemId: string): Promise<Problem> => {
     try {
       const response = await axiosInstance.get(
-        `${API_URL}/${quizId}/problems/${problemId}`
+        `${API_URL}/${quizId}/questions/${problemId}`
       );
       return response.data;
     } catch (error) {
@@ -40,7 +42,7 @@ export const problemService = {
   ): Promise<Problem> => {
     try {
       const response = await axiosInstance.post(
-        `${API_URL}/${quizId}/problems`,
+        `${API_URL}/${quizId}/questions`,
         problem
       );
       return response.data;
@@ -58,7 +60,7 @@ export const problemService = {
   ): Promise<Problem> => {
     try {
       const response = await axiosInstance.put(
-        `${API_URL}/${quizId}/problems/${problemId}`,
+        `${API_URL}/${quizId}/questions/${problemId}`,
         problem
       );
       return response.data;
@@ -71,7 +73,7 @@ export const problemService = {
   // 문제 삭제
   deleteProblem: async (quizId: number, problemId: number): Promise<void> => {
     try {
-      await axiosInstance.delete(`${API_URL}/${quizId}/problems/${problemId}`);
+      await axiosInstance.delete(`${API_URL}/${quizId}/questions/${problemId}`);
     } catch (error) {
       console.error("Error deleting problem:", error);
       throw error;
