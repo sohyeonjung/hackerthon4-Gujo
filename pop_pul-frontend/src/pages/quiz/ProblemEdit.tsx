@@ -4,7 +4,7 @@ import { Problem, CreateProblemDto } from "../../types/problem";
 import { problemService } from "../../services/problemService";
 
 const ProblemEdit: React.FC = () => {
-  const { id, problemId } = useParams();
+  const { id, questionId } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<CreateProblemDto>({
     title: "",
@@ -21,19 +21,19 @@ const ProblemEdit: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("URL params:", { id, problemId });
-    if (!id || !problemId) {
-      console.error("Missing URL parameters:", { id, problemId });
+    console.log("URL params:", { id, questionId });
+    if (!id || !questionId) {
+      console.error("Missing URL parameters:", { id, questionId });
       return;
     }
     loadProblem();
-  }, [id, problemId]);
+  }, [id, questionId]);
 
   const loadProblem = async () => {
-    if (!id || !problemId) return;
+    if (!id || !questionId) return;
     try {
-      console.log("Loading problem:", { quizId: id, problemId });
-      const problem = await problemService.getProblem(id, problemId);
+      console.log("Loading problem:", { quizId: id, questionId });
+      const problem = await problemService.getProblem(id, questionId);
       setFormData({
         title: problem.title,
         image: problem.image || "",
@@ -79,7 +79,7 @@ const ProblemEdit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !problemId) return;
+    if (!id || !questionId) return;
 
     setIsSubmitting(true);
     setError(null);
@@ -87,7 +87,7 @@ const ProblemEdit: React.FC = () => {
     try {
       await problemService.updateProblem(
         Number(id),
-        Number(problemId),
+        Number(questionId),
         formData
       );
       navigate(`/quiz/${id}`);
