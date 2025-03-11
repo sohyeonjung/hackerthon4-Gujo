@@ -30,15 +30,18 @@ public class QuizStreamController {
     @GetMapping("/start/{quizId}")
     public ResponseEntity<Void> startQuiz(
             @PathVariable Long quizId
-    ){
+    ) throws InterruptedException {
         //SseEmitter emitter = new SseEmitter();
         //emitters.put(pin, emitter);
         //SSE로 문제 전송 시작
         quizStreamService.startQuiz(quizId);
         return ResponseEntity.ok().build();
     }
-
-
+    //퀴즈 종료
+    @DeleteMapping("/start/{quizId}")
+    public void stopQuiz(@PathVariable Long quizId) {
+        quizStreamService.stopQuiz(quizId);
+    }
 
     ///--- 클라이언트---
 
@@ -59,44 +62,6 @@ public class QuizStreamController {
     ){
         quizStreamService.broadcast(username, "데이터 전송완료, username: "+username);
     }
-
-
-
-//    //SSE를 통한 실시간 퀴즈 전달
-//    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-//    public ResponseEntity<SseEmitter> streamQuiz(@RequestParam Long quizId) {
-//
-//        SseEmitter emitter = new SseEmitter();
-//        Thread thread = new Thread(() -> {
-//            try {
-//                while (true) {
-//                    var quiz = quizStreamService.getQuizById(quizId);
-//                    List<QuestionStreamResponse> questions = quiz.get().getQuestionList();
-//
-//                    for (QuestionStreamResponse question : questions) {
-//                        List<AnswerStreamResponse> answers =  question.getAnswerList();
-//                        log.info("List: ", answers);
-//                        log.info("question:",question.getTitle());
-//
-//                        Map<String, Object> quizData = new HashMap<>();
-//                        quizData.put("question: ", question.getTitle());
-//                        quizData.put("answers", answers);
-//
-//                        log.info("Quiz: {}\n", quizData);
-//
-//                        emitter.send(quizData);  // 클라이언트에게 QuizDto 전송
-//
-//
-//                    }
-//                    Thread.sleep(10000);  // 10초마다 갱신
-//                }
-//            } catch (Exception e) {
-//                emitter.completeWithError(e);
-//            }
-//        });
-//        thread.start();
-//        return ResponseEntity.ok(emitter);
-//    }
 
 
 
