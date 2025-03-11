@@ -60,21 +60,22 @@ public class EmitterRepository {
         return emitters.values();
     }
 
+
 //
 //    // 특정 유저의 PIN 가져오기
 //    public Integer getPin(String username) {
 //        return pins.get(username);
 //    }
 //
-//    //username 반환
-//    public String getUsernameByEmitter(SseEmitter emitter) {
-//        return emitters.entrySet()
-//                .stream()
-//                .filter(entry->entry.getValue().equals(emitter))
-//                .map(Map.Entry::getKey)
-//                .findFirst()
-//                .orElse(null);
-//    }
+    //username 반환
+    public String findUsernameByEmitter(SseEmitter emitter) {
+        return emitters.entrySet()
+                .stream()
+                .filter(entry->entry.getValue().equals(emitter))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
 //        public SseEmitter findByUsername(String username, Long quizId) {return emitters.get(username);}
 
 
