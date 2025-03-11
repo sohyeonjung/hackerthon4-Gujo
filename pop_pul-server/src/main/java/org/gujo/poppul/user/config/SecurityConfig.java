@@ -26,7 +26,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll() // 모든 요청에 대해 접근 허용
+                        //todo: need role permit and permit all setting
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/quiz/start/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

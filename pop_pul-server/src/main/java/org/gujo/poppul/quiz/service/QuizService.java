@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.gujo.poppul.answer.entity.Answer;
 import org.gujo.poppul.question.dto.QuestionDto;
 import org.gujo.poppul.question.entity.Question;
-import org.gujo.poppul.question.exception.QuestionNotFoundException;
 import org.gujo.poppul.question.repository.QuestionRepository;
 import org.gujo.poppul.quiz.dto.QuizDto;
 import org.gujo.poppul.quiz.entity.Quiz;
@@ -110,33 +109,11 @@ public class QuizService {
     }
 
     // ✅ 문제 삭제
-    public void deleteQuestion(Long quizId, Long questionId) {
-        // 퀴즈 존재 여부 확인
-        Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new QuizNotFoundException("퀴즈를 찾을 수 없습니다."));
-
-        // 문제가 해당 퀴즈에 속하는지 확인
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("문제를 찾을 수 없습니다."));
-
-        if (!question.getQuiz().getId().equals(quizId)) {
-            throw new IllegalArgumentException("해당 퀴즈에 속하지 않는 문제입니다.");
-        }
-
+    public void deleteQuestion(Long questionId) {
         questionRepository.deleteById(questionId);
     }
 
-    public Question createQuestion(Long quizId, QuestionDto questionDto) {
-        Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new QuizNotFoundException("퀴즈를 찾을 수 없습니다."));
 
-        Question question = questionDto.toEntity();
-        question.setQuiz(quiz);
-
-        return questionRepository.save(question);
-    }
-
-    // ✅ 특정 퀴즈의 모든 문제 조회
     public List<Question> getQuizQuestions(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new QuizNotFoundException("퀴즈를 찾을 수 없습니다."));

@@ -1,5 +1,7 @@
 import axios from "axios";
+
 import { Problem, CreateProblemDto, UpdateProblemDto } from "../types/problem";
+
 
 const API_URL = "http://localhost:8080/api/quiz";
 
@@ -38,7 +40,7 @@ export const problemService = {
   // 새로운 문제 생성
   createProblem: async (
     quizId: number,
-    problem: CreateProblemDto
+    problem: Omit<Problem, "id">
   ): Promise<Problem> => {
     try {
       const response = await axiosInstance.post(

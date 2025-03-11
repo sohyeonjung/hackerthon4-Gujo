@@ -104,7 +104,6 @@ public class QuizController {
         return ResponseEntity.ok(QuizDto.fromEntity(quiz));
     }
 
-
     // ✅ 특정 퀴즈의 모든 문제 조회
     @GetMapping("/{quizId}/questions")
     public ResponseEntity<List<QuestionDto>> getQuizQuestions(@PathVariable Long quizId, HttpServletRequest request) {

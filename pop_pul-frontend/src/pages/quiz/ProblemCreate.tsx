@@ -7,14 +7,11 @@ const ProblemCreate: React.FC = () => {
   const { id: quizId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<CreateProblemDto>({
-    title: "",
-    image: "",
-    answerList: [
-      { content: "", isCorrect: false },
-      { content: "", isCorrect: false },
-      { content: "", isCorrect: false },
-      { content: "", isCorrect: false },
-    ],
+    quizId: quizId || "",
+    question: "",
+    options: ["", "", "", ""],
+    correctAnswer: 0,
+    explanation: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,27 +22,16 @@ const ProblemCreate: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "answerList" ? prev.answerList : value,
+      [name]: value,
     }));
   };
 
-  const handleAnswerChange = (index: number, value: string) => {
-    const newAnswers = [...formData.answerList];
-    newAnswers[index] = { ...newAnswers[index], content: value };
+  const handleOptionChange = (index: number, value: string) => {
+    const newOptions = [...formData.options];
+    newOptions[index] = value;
     setFormData((prev) => ({
       ...prev,
-      answerList: newAnswers,
-    }));
-  };
-
-  const handleCorrectAnswerChange = (index: number) => {
-    const newAnswers = formData.answerList.map((answer, i) => ({
-      ...answer,
-      isCorrect: i === index,
-    }));
-    setFormData((prev) => ({
-      ...prev,
-      answerList: newAnswers,
+      options: newOptions,
     }));
   };
 
@@ -66,6 +52,7 @@ const ProblemCreate: React.FC = () => {
       navigate(`/quiz/${quizId}`);
     } catch (error) {
       console.error("Error creating problem:", error);
+
       setError("문제 생성에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
@@ -86,15 +73,15 @@ const ProblemCreate: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
-              htmlFor="title"
+              htmlFor="question"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               문제
             </label>
             <textarea
-              id="title"
-              name="title"
-              value={formData.title}
+              id="question"
+              name="question"
+              value={formData.question}
               onChange={handleChange}
               required
               rows={3}
@@ -103,47 +90,50 @@ const ProblemCreate: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              이미지 URL (선택사항)
-            </label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="이미지 URL을 입력하세요"
-            />
-          </div>
-
           <div className="space-y-4">
             <label className="block text-sm font-medium text-gray-700">
               보기
             </label>
-            {formData.answerList.map((answer, index) => (
+            {formData.options.map((option, index) => (
               <div key={index} className="flex items-center space-x-3">
                 <input
                   type="radio"
                   name="correctAnswer"
-                  checked={answer.isCorrect}
-                  onChange={() => handleCorrectAnswerChange(index)}
+                  value={index}
+                  checked={formData.correctAnswer === index}
+                  onChange={() =>
+                    setFormData((prev) => ({ ...prev, correctAnswer: index }))
+                  }
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                 />
                 <input
                   type="text"
-                  value={answer.content}
-                  onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
                   required
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={`보기 ${index + 1}`}
                 />
               </div>
             ))}
+          </div>
+
+          <div>
+            <label
+              htmlFor="explanation"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              해설 (선택사항)
+            </label>
+            <textarea
+              id="explanation"
+              name="explanation"
+              value={formData.explanation}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="문제에 대한 해설을 입력하세요"
+            />
           </div>
 
           <div className="flex justify-end space-x-3">
