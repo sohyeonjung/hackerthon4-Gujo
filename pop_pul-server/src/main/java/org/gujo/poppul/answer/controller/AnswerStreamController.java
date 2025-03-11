@@ -6,10 +6,7 @@ import org.gujo.poppul.quiz.entity.ParticipantManager;
 import org.gujo.poppul.quiz.service.QuizStreamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -23,20 +20,15 @@ public class AnswerStreamController {
 
 
     //퀴즈 참가자가 답변 제출
-    @PostMapping("/answer")
+    @PostMapping("/{quizId}/answer")
     public ResponseEntity<String> submitAnswer(
+            @PathVariable Long quizId,
             @RequestParam String username,
             @RequestParam Long questionId,
-            @RequestParam String answer
+            @RequestParam Integer answer
     ) {
         // questionId를 기반으로 정답을 확인
-        boolean isCorrect = answerStreamService.checkAnswer(questionId, answer);
+        return answerStreamService.checkAnswer(username, questionId, answer);
 
-        if (isCorrect) {
-            participantManager.updateScore(username, 10);
-            return ResponseEntity.ok("정답");
-        } else {
-            return ResponseEntity.ok("오답");
-        }
     }
 }

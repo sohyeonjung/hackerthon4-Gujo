@@ -31,7 +31,7 @@ public class Question {
     private Quiz quiz;
 
     @Builder.Default
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Answer> answerList = new ArrayList<>();
 
 }

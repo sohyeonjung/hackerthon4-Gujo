@@ -50,7 +50,7 @@
 
         //문제 출제 시작
         @Transactional
-        public void startQuiz(Long quizId) {
+        public void startQuiz(Long quizId) throws InterruptedException {
     
     
             //quiz찾기
@@ -70,7 +70,8 @@
             for (Question question : questions) {
                 log.info("Question: " + question.getTitle());
             }
-    
+
+            //----[퀴즈 전송]-----
             //quiz_id가 같은 접속 유저들에게 퀴즈 보여주기 시작
             Collection<SseEmitter> sseEmitters = emitterRepository.findByQuizId(quizId);
 
@@ -115,58 +116,52 @@
                     throw new RuntimeException("연결 오류");
                 }
             }
-//            for (SseEmitter sseEmitter : sseEmitters) {
-//
-//                try {
-//                    for(Question question : quiz.getQuestionList()){
-//                        //문제 출제자 용 화면
-//                        Map<String, Object> ddata = new HashMap<>();
-//                        ddata.put("question", question.getTitle());
-//
-//                        Map<Integer, String> admin = new HashMap<>();
-//                        for (Answer answer : question.getAnswerList()) {
-//                            admin.put(answer.getNo(), answer.getContent());
-//                        }
-//                        ddata.put("answers", admin);
-//                        SseEmitter adminSse = emitterRepository.findByName("admin");
-//                        adminSse.send(
-//                                SseEmitter.event()
-//                                        .name(String.valueOf(question.getId()))
-//                                        .data(ddata)
-//                        );
-//                        log.info("admin sent");
-//
-//                        if(!emitterRepository.findByUsername("admin")){
-//                            //문제 푸는 사람 용 화면
-//                            Map<String, Object> data = new HashMap<>();
-//                            data.put("question", question.getTitle());
-//                            log.info("Question: " + question.getTitle());
-//
-//                            List<Integer> a = new ArrayList<>();
-//                            for(int i=1; i<=question.getAnswerList().size(); i++){
-//                                a.add(i);
-//                            }
-//                            data.put("answers", a);
-//
-//                            //데이터 전송
-//                            sseEmitter.send(
-//                                    SseEmitter.event()
-//                                            .name(String.valueOf(question.getId()))
-//                                            .data(data)
-//                            );
-//                            log.info("SseEmitter sent");
-//                        }
-//
-//
-//                        Thread.sleep(10000);  // 10초마다 갱신
-//                    }
-//
-//                } catch (IOException | InterruptedException e) {
-//                    // 오류 발생 시 emitter를 제거
-//                    emitterRepository.deleteByName(sseEmitter.getClass().getName());
-//                    throw new RuntimeException("연결 오류");
-//                }
-//            }
+
+            //Thread.sleep(20000);
+            //------[퀴즈 종료 후 랭크 화면]------
+            List<Map.Entry<String, Integer>> rank = emitterRepository.getRankedScores(quizId);
+            //출제자용
+            Map<String, Object> rankData = new HashMap<>();
+            rankData.put("ranking", rank);
+            // 출제자에게 전체 랭킹 전송
+            for (SseEmitter sseEmitter : sseEmitters) {
+                String username = emitterRepository.findUsernameByEmitter(sseEmitter);
+                if ("admin".equals(username)) {
+                    try {
+                        sseEmitter.send(SseEmitter.event().name("ranking").data(rankData));
+                        log.info("Sent ranking to admin");
+                    } catch (IOException e) {
+                        log.error("Error sending ranking to admin", e);
+                        emitterRepository.deleteByName(username);
+                    }
+                }
+            }
+
+            //각 사용자에게 순위 전송
+            for (SseEmitter sseEmitter : sseEmitters) {
+                String username = emitterRepository.findUsernameByEmitter(sseEmitter);
+
+                // 사용자 순위 찾기 (Stream 사용)
+                int rankIndex = rank.stream()
+                        .filter(entry -> entry.getKey().equals(username)) // username과 일치하는 항목을 필터링
+                        .map(rankEntry -> rank.indexOf(rankEntry) + 1) // 순위를 1부터 시작하도록 설정
+                        .findFirst() // 첫 번째 일치하는 순위를 찾음
+                        .orElse(-1); // 만약 일치하는 순위가 없으면 -1을 반환
+
+                Map<String, Object> userRankData = new HashMap<>();
+                userRankData.put("username", username);
+                userRankData.put("rank", rankIndex);
+
+                try {
+                    sseEmitter.send(SseEmitter.event().name("user-rank").data(userRankData));
+                    log.info("Sent user rank for {}: {}", username, rankIndex);
+                } catch (IOException e) {
+                    log.error("Error sending rank to user", e);
+                    emitterRepository.deleteByName(username);
+                }
+            }
+
+
         }
     
     
@@ -257,7 +252,9 @@
                     .questionList(questionList)
                     .build();
         }
-    
-    
-    
+
+
+        public void stopQuiz(Long quizId) {
+            emitterRepository.clearByQuizId(quizId);
+        }
     }

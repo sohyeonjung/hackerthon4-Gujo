@@ -21,7 +21,7 @@ public class Quiz {
     private Long id;
     private String title; // 퀴즈 제목
     @Column
-    private Long user_id;
+    private String user_id;
 
     @Builder.Default
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
