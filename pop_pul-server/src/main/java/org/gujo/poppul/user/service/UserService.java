@@ -6,6 +6,8 @@ import org.gujo.poppul.user.dto.UserRequest;
 import org.gujo.poppul.user.dto.UserResponse;
 import org.gujo.poppul.user.entity.User;
 import org.gujo.poppul.user.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -99,6 +101,23 @@ public class UserService implements UserDetailsService {
                 .name(userRequest.getName())
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .build();
+    }
+
+    /**
+     * 현재 인증된 사용자의 이름을 반환합니다.
+     *
+     * @return String 현재 사용자의 이름, 인증되지 않은 경우 null
+     */
+    @Transactional(readOnly = true)
+    public String getCurrentUserName() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            String username = auth.getName();
+            return userRepository.findById(username)
+                    .map(User::getName)
+                    .orElse(null);
+        }
+        return null;
     }
 
     // 성공 응답 생성 헬퍼 메서드
