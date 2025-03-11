@@ -44,6 +44,8 @@ public class UserController {
                     .build();
 
             session.setAttribute("user", response);
+            session.setAttribute("userId", userRequest.getId());  // userId도 함께 저장
+
             log.info("User logged in: {}", userRequest.getId());
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
