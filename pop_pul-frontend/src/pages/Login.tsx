@@ -1,6 +1,6 @@
 // src/pages/Login.tsx
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import "./Login.css";
 
@@ -17,7 +17,7 @@ const Login: React.FC = () => {
       await login(username, password);
       navigate("/");
     } catch (err) {
-      setError("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
+      setError("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요."+err);
     }
   };
 

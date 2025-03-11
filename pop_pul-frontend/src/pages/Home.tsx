@@ -19,7 +19,7 @@ const Home: React.FC = () => {
       const quiz = await quizService.joinQuiz(pin);
       navigate(`/quizzes/${quiz.id}/play`);
     } catch (error) {
-      setError("잘못된 PIN 번호입니다. 다시 확인해주세요.");
+      setError("잘못된 PIN 번호입니다. 다시 확인해주세요."+error);
     }
   };
 
