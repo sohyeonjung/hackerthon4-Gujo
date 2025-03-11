@@ -1,5 +1,6 @@
 package org.gujo.poppul.answer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.gujo.poppul.question.entity.Question;
@@ -22,9 +23,9 @@ public class Answer {
     private String content;
     @Column
     private boolean is_answer;
-    //@JsonIgnore
-    //@ToString.Exclude
     @ManyToOne()
+    @ToString.Exclude
+    @JsonIgnore
     @JoinColumn(name = "question_id")
     private Question question;
 
