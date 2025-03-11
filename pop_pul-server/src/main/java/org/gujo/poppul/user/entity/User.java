@@ -2,6 +2,10 @@ package org.gujo.poppul.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.gujo.poppul.quiz.entity.Quiz;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "User")
@@ -21,7 +25,7 @@ public class User {
     @Column(length = 255)
     private String password;
     
-//    @OneToMany
-//    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-//    private List<Quiz> quizzes = new ArrayList<>();
+    @OneToMany
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private List<Quiz> quizzes = new ArrayList<>();
 }
