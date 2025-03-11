@@ -70,7 +70,7 @@ public class QuizStreamService {
                 for(Question question : quiz.getQuestionList()){
                     //문제 출제자 용 화면
                     Map<String, Object> ddata = new HashMap<>();
-                    ddata.put("question", question);
+                    ddata.put("question", question.getTitle());
 
                     Map<Integer, String> admin = new HashMap<>();
                     for (Answer answer : question.getAnswerList()) {
