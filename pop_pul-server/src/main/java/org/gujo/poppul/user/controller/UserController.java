@@ -66,4 +66,18 @@ public class UserController {
                         .build()
         );
     }
+
+    @GetMapping("/check-auth")
+    public ResponseEntity<UserResponse> checkAuth(HttpSession session) {
+        UserResponse user = (UserResponse) session.getAttribute("user");
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.ok(
+                UserResponse.builder()
+                        .success(false)
+                        .message("인증되지 않음")
+                        .build()
+        );
+    }
 }

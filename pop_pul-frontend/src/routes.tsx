@@ -1,77 +1,28 @@
 // src/routes.tsx
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./hooks/useAuth";
-import { createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout'; // layouts 대신 components로 이동
+import Home from './pages/Home';
+// import QuizCreate from './pages/QuizCreate';
+// import QuizEdit from './pages/QuizEdit';
+// import QuizList from './pages/QuizList';
+// import QuizPlay from './pages/QuizPlay';
+// import QuizResult from './pages/QuizResult';
 
-// Layouts
-import MainLayout from "./layouts/MainLayout";
+// ProtectedRoute 컴포넌트
+// const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+//   const { user, isLoading, setShowLoginPopup } = useUser();
 
-// Pages
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import QuizList from "./pages/QuizList";
-import QuizCreate from "./pages/QuizCreate";
-import QuizEdit from "./pages/QuizEdit";
-import QuizPlay from "./pages/QuizPlay";
-import QuizResult from "./pages/QuizResult";
+//   if (isLoading) {
+//     return <div>Loading...</div>;
+//   }
 
-// Protected route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+//   if (!user) {
+//     setShowLoginPopup(true); // 팝업 띄우기
+//     return null; // 페이지 렌더링 중단
+//   }
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-
-  return <>{children}</>;
-};
-
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "signup",
-        element: <Signup />,
-      },
-      {
-        path: "quizzes",
-        element: <QuizList />,
-      },
-      {
-        path: "quizzes/create",
-        element: <QuizCreate />,
-      },
-      {
-        path: "quizzes/:id/edit",
-        element: <QuizEdit />,
-      },
-      {
-        path: "quiz/:pin",
-        element: <QuizPlay />,
-      },
-      {
-        path: "quiz/result/:id",
-        element: <QuizResult />,
-      },
-    ],
-  },
-]);
+//   return <>{children}</>;
+// };
 
 const AppRoutes = () => {
   return (
@@ -79,11 +30,8 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
-
           <Route path="quiz">
-            <Route index element={<QuizList />} />
+            {/* <Route index element={<QuizList />} />
             <Route
               path="create"
               element={
@@ -101,7 +49,7 @@ const AppRoutes = () => {
               }
             />
             <Route path="play/:id" element={<QuizPlay />} />
-            <Route path="result/:id" element={<QuizResult />} />
+            <Route path="result/:id" element={<QuizResult />} /> */}
           </Route>
         </Route>
       </Routes>
