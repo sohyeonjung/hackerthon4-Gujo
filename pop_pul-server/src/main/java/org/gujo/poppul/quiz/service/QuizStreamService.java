@@ -40,16 +40,16 @@ public class QuizStreamService {
     public SseEmitter createQuiz(Long quizId) {
         // 4자리 랜덤 PIN 생성
         int pin = (int)(Math.random() * 9000) + 1000;
+        log.info("pin: "+pin);
 
-        //각 퀴즈에 대한 점수 저장
-        //scores.put(pin, new HashMap<>());
-        //TODO USER와 연결해야함
-        var emitter = subscribe(quizId, "admin");
         pinList.put(quizId, pin);
+        //TODO USER와 연결해야함
+        var emitter = subscribe(quizId, "admin",pin);
         return emitter;
     }
     //문제 출제 시작
     public void startQuiz(Long quizId) {
+
 
         //quiz찾기
         Quiz quiz = quizStreamRepository.findById(quizId).orElse(null);
@@ -58,9 +58,6 @@ public class QuizStreamService {
         if (quiz == null) {
             throw new IllegalArgumentException("Quiz not found for id: " + quizId);
         }
-
-
-
 
         log.info("Quiz {} already started", quizId);
 
@@ -80,15 +77,15 @@ public class QuizStreamService {
                         admin.put(answer.getNo(), answer.getContent());
                     }
                     ddata.put("answers", admin);
-                    SseEmitter adminsse = emitterRepository.findByName("admin");
-                    adminsse.send(
+                    SseEmitter adminSse = emitterRepository.findByName("admin");
+                    adminSse.send(
                             SseEmitter.event()
                                     .name("admin question")
                                     .data(ddata)
                     );
                     log.info("admin sent");
 
-                    if(!emitterRepository.findByUsername("root")){
+                    if(!emitterRepository.findByUsername("admin")){
                         //문제 푸는 사람 용 화면
                         Map<String, Object> data = new HashMap<>();
                         data.put("question", question.getTitle());
@@ -132,10 +129,16 @@ public class QuizStreamService {
 
 
     ///--- 클라이언트
-    public SseEmitter subscribe(Long quizId, String username){
-        //TODO pin 검사
+    public SseEmitter subscribe(Long quizId, String username, Integer pin){
+        //pin 검사
+        log.info("pin: "+pin);
+
+        if (!pinList.containsKey(quizId) || !pinList.get(quizId).equals(pin)) {
+            throw new IllegalArgumentException("Invalid PIN for quiz ID: " + quizId);
+        }
+
         //timeout 없는 sse생성
-        SseEmitter sseEmitter =  emitterRepository.save(quizId, username, new SseEmitter(-1L));
+        SseEmitter sseEmitter =  emitterRepository.save(quizId, username, pin, new SseEmitter(-1L));
         // 연결이 끊기면 자동 삭제
         sseEmitter.onCompletion(() -> {
             log.info("SseEmitter 연결 종료: {}", username);
@@ -145,8 +148,16 @@ public class QuizStreamService {
             log.info("SseEmitter 타임아웃: {}", username);
             emitterRepository.deleteByName(username);
         });
-        //첫 구독시 이벤트 발생
-        broadcast(username, "subscribe complete, username: "+username);
+
+        //pin번호 공개
+        if(username=="admin"){
+            broadcast(username, "pin: "+pin);
+        }
+        else{
+            //첫 구독시 이벤트 발생
+            broadcast(username, "subscribe complete, username: "+username);
+        }
+
 
 
         return sseEmitter;

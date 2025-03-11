@@ -1,13 +1,13 @@
 package org.gujo.poppul.quiz.controller;
 
 
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.gujo.poppul.quiz.service.QuizStreamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 
 @Slf4j
 @RestController
@@ -49,7 +49,7 @@ public class QuizStreamController {
             @RequestParam Integer pin,
             @RequestParam String username
     ){
-        return quizStreamService.subscribe(quizId, username);
+        return quizStreamService.subscribe(quizId, username, pin);
     }
     //이벤트 구독 중인 클라이언트에게 데이터 전송
     @PostMapping("/broadcast")

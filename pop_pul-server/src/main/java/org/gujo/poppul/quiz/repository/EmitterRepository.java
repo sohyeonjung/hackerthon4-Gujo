@@ -14,6 +14,8 @@ public class EmitterRepository {
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
     //quiz_id별로 해당하는 username을 저장
     private final Map<Long, List<String>> info = new ConcurrentHashMap<>();
+    //pin저장
+    private final Map<String, Integer> pins = new ConcurrentHashMap<>();
 
     //퀴즈 접속자 이름으로 boardcast를 위해 구독 중인 사용자의 SseEmitter 조회
     public SseEmitter findByName(String username) {
@@ -36,14 +38,13 @@ public class EmitterRepository {
         return emitters.containsKey(username);
     }
 
-    public SseEmitter findByUsername(String username, Long quizId) {
-        return emitters.get(username);
-    }
+
 
     //접속사 저장
-    public SseEmitter save(Long quizId, String username, SseEmitter emitter) {
+    public SseEmitter save(Long quizId, String username, Integer pin, SseEmitter emitter) {
         emitters.put(username, emitter);
         info.computeIfAbsent(quizId, k -> new ArrayList<>()).add(username);
+        pins.put(username, pin);
         return emitters.get(username);
     }
 
@@ -51,11 +52,30 @@ public class EmitterRepository {
     public void deleteByName(String username) {
         emitters.remove(username);
         info.forEach((quizId, usernames) -> usernames.remove(username));
+        pins.remove(username);
     }
 
+    //전체 sseemitter 가져오기
     public Collection<SseEmitter> values() {
         return emitters.values();
     }
+
+//
+//    // 특정 유저의 PIN 가져오기
+//    public Integer getPin(String username) {
+//        return pins.get(username);
+//    }
+//
+//    //username 반환
+//    public String getUsernameByEmitter(SseEmitter emitter) {
+//        return emitters.entrySet()
+//                .stream()
+//                .filter(entry->entry.getValue().equals(emitter))
+//                .map(Map.Entry::getKey)
+//                .findFirst()
+//                .orElse(null);
+//    }
+//        public SseEmitter findByUsername(String username, Long quizId) {return emitters.get(username);}
 
 
 }
