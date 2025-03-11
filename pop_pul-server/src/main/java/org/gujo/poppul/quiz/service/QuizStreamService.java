@@ -42,11 +42,9 @@ public class QuizStreamService {
         int pin = (int)(Math.random() * 9000) + 1000;
         log.info("pin: "+pin);
 
-        //각 퀴즈에 대한 점수 저장
-        //scores.put(pin, new HashMap<>());
         pinList.put(quizId, pin);
         //TODO USER와 연결해야함
-        var emitter = subscribe(quizId, "[pin] :"+pin,pin);
+        var emitter = subscribe(quizId, "admin",pin);
         return emitter;
     }
     //문제 출제 시작
@@ -79,15 +77,15 @@ public class QuizStreamService {
                         admin.put(answer.getNo(), answer.getContent());
                     }
                     ddata.put("answers", admin);
-                    SseEmitter adminsse = emitterRepository.findByName("admin");
-                    adminsse.send(
+                    SseEmitter adminSse = emitterRepository.findByName("admin");
+                    adminSse.send(
                             SseEmitter.event()
                                     .name("admin question")
                                     .data(ddata)
                     );
                     log.info("admin sent");
 
-                    if(!emitterRepository.findByUsername("root")){
+                    if(!emitterRepository.findByUsername("admin")){
                         //문제 푸는 사람 용 화면
                         Map<String, Object> data = new HashMap<>();
                         data.put("question", question.getTitle());
@@ -132,8 +130,7 @@ public class QuizStreamService {
 
     ///--- 클라이언트
     public SseEmitter subscribe(Long quizId, String username, Integer pin){
-        //TODO pin 검사
-
+        //pin 검사
         log.info("pin: "+pin);
 
         if (!pinList.containsKey(quizId) || !pinList.get(quizId).equals(pin)) {
@@ -151,8 +148,16 @@ public class QuizStreamService {
             log.info("SseEmitter 타임아웃: {}", username);
             emitterRepository.deleteByName(username);
         });
-        //첫 구독시 이벤트 발생
-        broadcast(username, "subscribe complete, username: "+username);
+
+        //pin번호 공개
+        if(username=="admin"){
+            broadcast(username, "pin: "+pin);
+        }
+        else{
+            //첫 구독시 이벤트 발생
+            broadcast(username, "subscribe complete, username: "+username);
+        }
+
 
 
         return sseEmitter;

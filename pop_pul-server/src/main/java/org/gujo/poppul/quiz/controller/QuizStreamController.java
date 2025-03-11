@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/api/quiz")
@@ -30,8 +29,7 @@ public class QuizStreamController {
     //문제 출제 시작
     @GetMapping("/start/{quizId}")
     public ResponseEntity<Void> startQuiz(
-            @PathVariable Long quizId,
-            @RequestParam Integer pin
+            @PathVariable Long quizId
     ){
         //SseEmitter emitter = new SseEmitter();
         //emitters.put(pin, emitter);
