@@ -1,11 +1,13 @@
-import { AuthProvider } from "./hooks/useAuth";
-import AppRoutes from "./routes";
+// src/App.tsx
 import "./App.css";
+import { AuthProvider } from "./hooks/useUser";
+import AppRoutes from "./routes";
 
 function App() {
+
   return (
     <AuthProvider>
-      <AppRoutes />
+        <AppRoutes />
     </AuthProvider>
   );
 }

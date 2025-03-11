@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { quizService } from "../services/quiz";
+//import { quizService } from "../services/quiz";
 import "./Home.css";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [pin, setPin] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
+  const user = false;
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pin) return;
+    // if (!pin) return;
 
-    try {
-      setError(null);
-      const quiz = await quizService.joinQuiz(pin);
-      navigate(`/quizzes/${quiz.id}/play`);
-    } catch (error) {
-      setError("잘못된 PIN 번호입니다. 다시 확인해주세요."+error);
-    }
+    // try {
+    //   setError(null);
+    //   const quiz = await quizService.joinQuiz(pin);
+    //   navigate(`/quizzes/${quiz.id}/play`);
+    // } catch (error) {
+    //   setError("잘못된 PIN 번호입니다. 다시 확인해주세요."+error);
+    // }
   };
 
   return (

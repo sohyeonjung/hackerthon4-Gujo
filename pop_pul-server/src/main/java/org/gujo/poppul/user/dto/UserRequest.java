@@ -9,4 +9,5 @@ import lombok.*;
 public class UserRequest {
     private String id;
     private String password;
+    private String name;
 }
