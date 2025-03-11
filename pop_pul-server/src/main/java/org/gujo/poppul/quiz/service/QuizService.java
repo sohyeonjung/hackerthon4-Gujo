@@ -2,6 +2,7 @@ package org.gujo.poppul.quiz.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.gujo.poppul.answer.entity.Answer;
 import org.gujo.poppul.question.dto.QuestionDto;
 import org.gujo.poppul.question.entity.Question;
 import org.gujo.poppul.question.exception.QuestionNotFoundException;
@@ -88,8 +89,21 @@ public class QuizService {
         return questionRepository.findById(questionId).map(question -> {
             question.setTitle(updatedQuestion.getTitle());
             question.setImage(updatedQuestion.getImage());
+
+            // 기존 답변들 삭제
+            question.getAnswerList().clear();
+
+            // 새로운 답변들 추가
+            updatedQuestion.getAnswerList().forEach(answerDto -> {
+                Answer answer = new Answer();
+                answer.setContent(answerDto.getContent());
+                answer.set_answer(answerDto.isAnswer()); // is_answer로 수정
+                answer.setQuestion(question);
+                question.getAnswerList().add(answer);
+            });
+
             return questionRepository.save(question);
-        }).orElseThrow(() -> new RuntimeException("문제를 찾을 수 없습니다."));
+        }).orElseThrow(() -> new QuestionNotFoundException("문제를 찾을 수 없습니다."));
     }
 
     // ✅ 문제 삭제
