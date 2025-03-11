@@ -1,19 +1,15 @@
-version: '3.8'
-
 services:
-  mysql:
+  pop_pul:
     image: mysql:8.0
     container_name: pop_pul-mysql
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: pop_pul
-      MYSQL_USER: team_user_dev  # 개발용 계정
-      MYSQL_PASSWORD: team_password_dev  # 개발용 계정 비밀번호
     ports:
       - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
     volumes:
       - mysql_data:/var/lib/mysql
 
 volumes:
-  mysql_data:
+  mysql_data:  # 볼륨을 명시적으로 정의
+
