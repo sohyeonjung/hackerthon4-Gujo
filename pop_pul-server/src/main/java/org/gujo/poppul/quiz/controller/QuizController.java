@@ -9,6 +9,7 @@ import org.gujo.poppul.quiz.dto.QuizDto;
 import org.gujo.poppul.quiz.entity.Quiz;
 import org.gujo.poppul.quiz.exception.QuizNotFoundException;
 import org.gujo.poppul.quiz.exception.UnauthorizedAccessException;
+import org.gujo.poppul.quiz.repository.QuizRepository;
 import org.gujo.poppul.quiz.service.QuizService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.List;
 public class QuizController {
 
     private final QuizService quizService;
+    private final QuizRepository quizRepository;
 
     // ✅ 퀴즈 생성 (세션 기반 사용자 ID 추가)
     @PostMapping
@@ -101,4 +103,25 @@ public class QuizController {
 
         return ResponseEntity.ok(QuizDto.fromEntity(quiz));
     }
+
+    // ✅ 특정 퀴즈의 모든 문제 조회
+    @GetMapping("/{quizId}/questions")
+    public ResponseEntity<List<QuestionDto>> getQuizQuestions(@PathVariable Long quizId, HttpServletRequest request) {
+        String userId = (String) request.getSession().getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Quiz quiz = quizService.getQuiz(quizId);
+        if (!quiz.getUser_id().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<Question> questions = quizService.getQuizQuestions(quizId);
+        List<QuestionDto> questionDtos = questions.stream()
+                .map(QuestionDto::fromEntity)
+                .toList();
+        return ResponseEntity.ok(questionDtos);
+    }
+
 }
