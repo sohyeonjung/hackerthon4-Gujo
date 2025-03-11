@@ -1,25 +1,24 @@
+export interface Answer {
+  id: number;
+  content: string;
+  isCorrect: boolean;
+}
+
 export interface Problem {
-  id: string;
-  quizId: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  id: number;
+  title: string;
+  image?: string;
+  answerList: Answer[];
 }
 
 export interface CreateProblemDto {
-  quizId: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
+  title: string;
+  image?: string;
+  answerList: Omit<Answer, "id">[];
 }
 
 export interface UpdateProblemDto {
-  question?: string;
-  options?: string[];
-  correctAnswer?: number;
-  explanation?: string;
+  title?: string;
+  image?: string;
+  answerList?: Omit<Answer, "id">[];
 }
