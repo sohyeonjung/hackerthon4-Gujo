@@ -23,26 +23,28 @@ const ProblemList: React.FC = () => {
     try {
       const [quizData, problemsData] = await Promise.all([
         quizService.getQuiz(quizId),
-        problemService.getProblems(quizId),
+        problemService.getProblems(Number(quizId)),
       ]);
       setQuiz(quizData);
       setProblems(problemsData);
       setError(null);
-    } catch (err) {
+    } catch (error) {
+      console.error("Error loading quiz and problems:", error);
       setError("데이터를 불러오는데 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDelete = async (problemId: string) => {
+  const handleDelete = async (problemId: number) => {
     if (!quizId || !window.confirm("정말로 이 문제를 삭제하시겠습니까?"))
       return;
 
     try {
-      await problemService.deleteProblem(quizId, problemId);
+      await problemService.deleteProblem(Number(quizId), problemId);
       setProblems(problems.filter((problem) => problem.id !== problemId));
-    } catch (err) {
+    } catch (error) {
+      console.error("Error deleting problem:", error);
       setError("문제 삭제에 실패했습니다.");
     }
   };
@@ -84,27 +86,29 @@ const ProblemList: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold mb-2">
-                      문제 {index + 1}. {problem.question}
+                      문제 {index + 1}. {problem.title}
                     </h3>
+                    {problem.image && (
+                      <img
+                        src={problem.image}
+                        alt="문제 이미지"
+                        className="mb-4 max-w-md rounded"
+                      />
+                    )}
                     <div className="space-y-2">
-                      {problem.options.map((option, optionIndex) => (
+                      {problem.answerList.map((answer, answerIndex) => (
                         <div
-                          key={optionIndex}
+                          key={answerIndex}
                           className={`p-2 rounded ${
-                            optionIndex === problem.correctAnswer
+                            answer.isCorrect
                               ? "bg-green-100 border border-green-300"
                               : "bg-gray-50 border border-gray-200"
                           }`}
                         >
-                          {option}
+                          {answer.content}
                         </div>
                       ))}
                     </div>
-                    {problem.explanation && (
-                      <div className="mt-4 text-gray-600">
-                        <strong>해설:</strong> {problem.explanation}
-                      </div>
-                    )}
                   </div>
                   <div className="flex space-x-2 ml-4">
                     <button
