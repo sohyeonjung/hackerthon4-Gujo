@@ -49,7 +49,7 @@ const ProblemCreate: React.FC = () => {
         answerList: formData.answerList,
       };
       await problemService.createProblem(Number(quizId), createProblemDto);
-      navigate(`/quiz/${quizId}`);
+      navigate(`/quiz/${quizId}/problems`);
     } catch (error) {
       console.error("Error creating problem:", error);
 
@@ -139,7 +139,7 @@ const ProblemCreate: React.FC = () => {
           <div className="flex justify-end space-x-3">
             <button
               type="button"
-              onClick={() => navigate(`/quiz/${quizId}`)}
+              onClick={() => navigate(`/quiz/${quizId}/problems`)}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               취소
